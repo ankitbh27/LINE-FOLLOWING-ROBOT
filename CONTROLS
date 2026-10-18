@@ -1,0 +1,3 @@
+Use the track presets to establish a baseline, or pause the run and draw directly on the course. Robot speed controls how far the chassis advances per update. Sensor count and spacing change the field of view. The P, I, and D controls change steering response; Step advances one deterministic update while paused.
+
+Start with a moderate speed, five sensors, and the default gains. Change one variable at a time and compare the error, lap time, and time-on-track metrics.
