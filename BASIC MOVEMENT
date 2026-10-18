@@ -1,0 +1,20 @@
+Moving Forward:
+
+Line Follower Robot Forward Navigation
+
+In this case, when both the sensors are on a white surface and the line is between the two sensors, the robot should move forward, i.e., both the motors should rotate such that the robot moves in forward direction (actually both the motors should rotate in the opposite direction due to the placement of motors in our setup. But for the sake of simplicity, we will call the motors rotating forward.)
+Turning LEFT:
+
+Line Follower Left Navigation
+
+In this case, the left sensor is on top of the dark line, whereas the right sensor is on the white part; hence, the left sensor detects the black line and gives a signal to the microcontroller. Since the signal comes from the left sensor, the robot should turn to the left. Therefore, the left motor rotates backwards, and the right motor rotates in the forward direction. Thus, the robot turns towards the left side.
+Turning RIGHT:
+
+Line Follower Right Navigation
+
+This case is similar to the left case, but in this situation, only the right sensor detects the line, which means that the robot should turn in the right direction. To turn the robot towards the right direction, the left motor rotates forward and the right motor rotates backwards, and as a result, the robot turns towards the right direction.
+Stopping:
+
+Line Follower STOP Navigation
+
+In this case, both sensors are on top of the line, and they can detect the black line simultaneously; the microcontroller is fed to consider this situation as a process to halt. Hence, both motors are stopped, which causes the robot to stop moving.
