@@ -1,0 +1,8 @@
+
+    Sample every sensor at a fixed interval.
+    Compute a weighted line position and normalize it around the center.
+    Reuse the last observed line direction when every sensor loses the track.
+    Update integral and derivative terms using the same fixed time step.
+    Clamp the correction, calculate left and right motor commands, and integrate the robot pose.
+
+Tune proportional gain until the robot follows gentle turns, add derivative gain until oscillation settles, and introduce only enough integral gain to remove a repeatable offset.
