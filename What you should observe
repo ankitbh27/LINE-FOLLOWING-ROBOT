@@ -1,0 +1,7 @@
+Symptom on the plot 	Cause 	Fix
+Steady weave on straights 	Kp too high, or Kd too low 	Halve Kp, then raise Kd
+Weave that grows 	Kp above the ultimate gain 	Reduce it
+Wide, slow corner cutting 	Too fast for the sensor lead 	Slow down, or move the array forward
+Jagged control effort 	Kd acting on a noisy position 	Filter, or reduce Kd
+Tracks slightly off-centre, always 	Uneven per-sensor calibration 	Normalise each channel against its own range
+Loses the line, drives straight on 	Error zeroed on line loss 	Hold the last error
