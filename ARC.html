@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ARC: Line Follower Simulator</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Unbounded:wght@600&display=swap">
+<style>
+:root{--bg:#eef1f5;--surface:#fff;--ink:#14213d;--mute:#5b6678;--line:#d3d9e2;--acc:#2f4bff;--acc2:#ff5a36;--code:#111a30;--codeink:#dfe6ff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1424;--surface:#161e33;--ink:#e8ecf7;--mute:#98a3bb;--line:#2a3452;--acc:#7b90ff;--acc2:#ff7a5c;--code:#0a0f1d;--codeink:#dfe6ff}}
+:root[data-theme="dark"]{--bg:#0e1424;--surface:#161e33;--ink:#e8ecf7;--mute:#98a3bb;--line:#2a3452;--acc:#7b90ff;--acc2:#ff7a5c;--code:#0a0f1d;--codeink:#dfe6ff}
+*,*:before,*:after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Figtree,system-ui,sans-serif}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:24px;padding:12px max(20px,4vw)}
+.logo{font:600 22px Unbounded,Figtree,sans-serif;letter-spacing:.04em;color:var(--ink);text-decoration:none}
+.logo i{display:inline-block;width:.62em;height:.62em;border:3px solid var(--acc2);border-right-color:transparent;border-radius:50%;margin-right:.3em;transform:rotate(-30deg)}
+nav{display:flex;gap:18px;margin-left:auto;font-size:15px;overflow-x:auto}
+nav a{color:var(--mute);text-decoration:none;white-space:nowrap}nav a:hover,nav a:focus-visible{color:var(--acc)}
+main{max-width:1040px;margin:0 auto;padding:0 max(20px,4vw) 64px}
+h1{font:600 clamp(30px,5vw,52px)/1.1 Unbounded,Figtree,sans-serif;margin:48px 0 14px;max-width:18ch}
+h2{font:700 26px/1.2 Figtree,sans-serif;margin:56px 0 12px}
+p{max-width:70ch}.lead{font-size:19px;color:var(--mute)}
+.facts{display:flex;gap:28px;flex-wrap:wrap;color:var(--mute);font-size:14px;margin:18px 0 28px}.facts b{display:block;color:var(--ink);font-size:16px}
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+select,button{font:600 14px Figtree,sans-serif;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 14px;cursor:pointer}
+button.go{background:var(--acc);border-color:var(--acc);color:#fff}
+button[aria-pressed=true]{background:var(--acc2);border-color:var(--acc2);color:#fff}
+button:focus-visible,select:focus-visible,input:focus-visible,canvas:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+#cv{width:100%;height:auto;aspect-ratio:8/5;display:block;border-radius:8px;border:1px solid var(--line);background:#fff;touch-action:none}
+#cv.draw{cursor:crosshair}
+.status{font-size:14px;color:var(--mute);margin:8px 0 0;min-height:22px}
+.panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:16px}
+fieldset{border:1px solid var(--line);border-radius:8px;margin:0;padding:10px 14px 14px;min-width:0}
+legend{font-weight:700;padding:0 6px}
+label{display:grid;grid-template-columns:96px 1fr 52px;align-items:center;gap:8px;font-size:14px;margin-top:6px}
+label output{text-align:right;font-variant-numeric:tabular-nums;color:var(--acc);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-top:16px}
+.stats div{border-left:3px solid var(--acc);padding-left:10px;font-size:13px;color:var(--mute)}.stats b{display:block;font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
+pre{background:var(--code);color:var(--codeink);padding:16px;border-radius:10px;overflow-x:auto;font:13.5px/1.55 ui-monospace,Menlo,Consolas,monospace}
+.eq{font-family:Georgia,serif;font-size:20px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;overflow-x:auto;white-space:nowrap}
+details{border-bottom:1px solid var(--line);padding:12px 0}summary{font-weight:700;cursor:pointer}details p{color:var(--mute);margin:8px 0 0}
+table{border-collapse:collapse;width:100%;font-size:15px;display:block;overflow-x:auto}th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line)}
+footer{border-top:1px solid var(--line);padding:24px max(20px,4vw);color:var(--mute);font-size:14px;text-align:center}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header>
+<a class="logo" href="#top"><i></i>ARC</a>
+<nav><a href="#sim">Simulator</a><a href="#theory">Theory</a><a href="#code">Code</a><a href="#experiments">Experiments</a><a href="#faq">FAQ</a></nav>
+</header>
+<main id="top">
+<h1>Tune a line-following robot in your browser</h1>
+<p class="lead">Draw a track, adjust the sensors, and tune a PID controller. Watch how each change affects the robot’s path.</p>
+<div class="facts"><span>Level<b>Beginner</b></span><span>Time<b>45–90 min</b></span><span>Platform<b>Browser, Arduino</b></span></div>
+
+<section id="sim" aria-label="Simulator">
+<div class="lab">
+<div class="bar">
+<select id="preset" aria-label="Track"><option value="loop">Starter loop</option><option value="oval">Fast oval</option><option value="tech">Technical circuit</option><option value="custom">Custom track</option></select>
+<button id="draw" aria-pressed="false">Draw track</button>
+<button id="clear">Clear track</button>
+<button id="full">Full screen</button>
+</div>
+<canvas id="cv" width="800" height="500" tabindex="0" aria-label="Line follower course. Space runs or pauses, N steps, R resets, D toggles drawing."></canvas>
+<p class="status" id="status" role="status">Paused. Press Start or Step to begin.</p>
+<div class="bar" style="margin-top:8px">
+<button class="go" id="start">Start</button><button id="pause">Pause</button><button id="step">Step</button><button id="reset">Reset</button>
+</div>
+<div class="panels">
+<fieldset><legend>Robot</legend>
+<label>Speed<input type="range" id="speed" min="30" max="180" value="78"><output></output></label>
+<label>Sensors<input type="range" id="count" min="3" max="9" value="5"><output></output></label>
+<label>Spacing (px)<input type="range" id="space" min="6" max="24" value="14"><output></output></label>
+</fieldset>
+<fieldset><legend>PID gains</legend>
+<label>P<input type="range" id="kp" min="0" max="3" step=".01" value=".82"><output></output></label>
+<label>I<input type="range" id="ki" min="0" max=".5" step=".005" value=".025"><output></output></label>
+<label>D<input type="range" id="kd" min="0" max="1" step=".005" value=".12"><output></output></label>
+</fieldset>
+</div>
+<div class="stats">
+<div>Elapsed<b id="sT">0.0 s</b></div><div>Distance<b id="sD">0</b></div><div>Line error<b id="sE">0.000</b></div><div>Steering<b id="sU">0.000</b></div><div>Track contact<b id="sC">100%</b></div>
+</div>
+</div>
+<p class="status">Highlighted sensors detect the line. The orange tick shows steering output. Drawing pauses the robot.</p>
+</section>
+
+<h2 id="theory">Theory</h2>
+<p>The sensor bar reads reflectance across the front of the robot. Each sensor has a signed position from the bar’s center, and the line position is the weighted average of those positions. Zero means centered; positive means the line is to the right.</p>
+<div class="eq">u(t) = K<sub>p</sub>·e(t) + K<sub>i</sub>·∫e(t)dt + K<sub>d</sub>·de(t)/dt</div>
+<p>The correction u turns the robot toward the line. P reacts to the present offset, I removes a steady bias, and D damps fast changes.</p>
+
+<h2>Algorithm</h2>
+<ol>
+<li>Read every sensor at a fixed interval.</li>
+<li>Compute the weighted line position, normalized to −1…1.</li>
+<li>If every sensor loses the line, hold the last error.</li>
+<li>Update the integral and derivative with the same time step.</li>
+<li>Clamp the correction, set steering, and move the robot.</li>
+</ol>
+
+<h2 id="code">Arduino version</h2>
+<pre><code>float integral = 0, previousError = 0;
+
+void controlStep(float dt) {
+  float error = readWeightedLinePosition();
+  integral = constrain(integral + error * dt, -2, 2);
+  float derivative = (error - previousError) / dt;
+  float correction = kp * error + ki * integral + kd * derivative;
+
+  setMotorSpeeds(baseSpeed + correction, baseSpeed - correction);
+  previousError = error;
+}</code></pre>
+<p>Keep the loop interval steady. A variable delay changes the I and D terms even when the gains stay the same.</p>
+
+<h2 id="experiments">Guided experiments</h2>
+<table>
+<tr><th>Try this</th><th>What to expect</th></tr>
+<tr><td>Set I and D to 0, raise P until the robot weaves steadily, then halve P</td><td>A solid starting P. Add D until the weaving settles.</td></tr>
+<tr><td>Raise speed by half without changing gains</td><td>It weaves or cuts corners, so every tune belongs to one speed.</td></tr>
+<tr><td>Compare 3, 5 and 9 sensors</td><td>More sensors give a finer error signal and allow higher gains.</td></tr>
+<tr><td>Push speed until it loses the line on a tight corner</td><td>It keeps turning the way it was already turning.</td></tr>
+</table>
+
+<h2 id="faq">FAQ</h2>
+<details><summary>Why does the robot weave along the line?</summary><p>P is too high, D is too low, or the speed is too high for the sensor layout. Lower speed first, then tune P and D.</p></details>
+<details><summary>How many sensors should I use?</summary><p>Five is a good start. Three works at low speed, and eight or nine help at higher speed.</p></details>
+<details><summary>Will these gains work on real hardware?</summary><p>Use them as a starting point. Real robots have motor deadband, wheel slip, lighting changes and loop jitter, so re-tune after calibrating your sensors.</p></details>
+</main>
+<footer>ARC · A teaching model, not a hardware replica.</footer>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)},cv=$('cv'),g=cv.getContext('2d');
+var W=800,H=500,mk=document.createElement('canvas');mk.width=W;mk.height=H;
+var m=mk.getContext('2d',{willReadFrequently:true});
+var path=[],run=false,drawing=false,R,trail=[],acc=0,last=0;
+var P={loop:function(t){return[400+290*Math.cos(t)+25*Math.cos(3*t),250+160*Math.sin(t)+20*Math.sin(2*t)]},
+oval:function(t){return[400+320*Math.cos(t),250+175*Math.sin(t)]},
+tech:function(t){return[400+280*Math.cos(t)+55*Math.cos(3*t),250+150*Math.sin(t)-35*Math.sin(3*t)]}};
+var sl=['speed','count','space','kp','ki','kd'];
+function val(id){return +$(id).value}
+function labels(){sl.forEach(function(id){var o=$(id).parentNode.querySelector('output');o.textContent=id=='kp'||id=='ki'||id=='kd'?val(id).toFixed(id=='ki'?3:2):val(id)})}
+sl.forEach(function(id){$(id).addEventListener('input',labels)});labels();
+function paint(pts){m.fillStyle='#fff';m.fillRect(0,0,W,H);if(!pts.length)return;m.strokeStyle='#000';m.lineWidth=10;m.lineJoin=m.lineCap='round';m.beginPath();pts.forEach(function(p,i){i?m.lineTo(p[0],p[1]):m.moveTo(p[0],p[1])});m.stroke()}
+function say(s){$('status').textContent=s}
+function place(){if(path.length<8){R=null;return}var a=path[0],b=path[Math.min(6,path.length-1)];R={x:a[0],y:a[1],th:Math.atan2(b[1]-a[1],b[0]-a[0]),I:0,e:0,le:0,u:0,T:0,D:0,on:0,n:0,lastDir:0};trail=[];stats()}
+function load(k){if(k=='custom'){path=[];paint(path);R=null;setDraw(true);say('Draw a track on the course, starting where the robot should begin.');return}
+setDraw(false);path=[];for(var i=0;i<=360;i++)path.push(P[k](i/360*Math.PI*2));paint(path);place();run=false;say('Paused. Press Start or Step to begin.');render()}
+function setDraw(on){drawing=on;$('draw').setAttribute('aria-pressed',on);cv.classList.toggle('draw',on);if(on)run=false}
+function sensors(){var n=val('count'),sp=val('space'),out=[],c=Math.cos(R.th),s=Math.sin(R.th);
+for(var i=0;i<n;i++){var off=(i-(n-1)/2)*sp,x=R.x+c*18-s*off,y=R.y+s*18+c*off,v=0;
+if(x>=0&&y>=0&&x<W&&y<H)v=1-m.getImageData(x|0,y|0,1,1).data[0]/255;out.push({x:x,y:y,v:v,off:off})}return out}
+function tick(dt){if(!R)return;var S=sensors(),n=val('count'),half=(n-1)/2*val('space'),sw=0,sv=0;
+S.forEach(function(q){sw+=q.v*q.off;sv+=q.v});var e;
+if(sv>0.05){e=sw/sv/half;R.lastDir=e<0?-1:e>0?1:R.lastDir;R.on++}else e=R.lastDir;
+R.I=Math.max(-2,Math.min(2,R.I+e*dt));var d=(e-R.le)/dt;
+var u=val('kp')*e+val('ki')*R.I+val('kd')*d;u=Math.max(-3,Math.min(3,u));
+R.th+=u*3.2*dt;var v=val('speed');R.x+=Math.cos(R.th)*v*dt;R.y+=Math.sin(R.th)*v*dt;
+R.le=e;R.e=e;R.u=u;R.T+=dt;R.D+=v*dt;R.n++;trail.push([R.x,R.y]);if(trail.length>500)trail.shift();
+if(R.x<-40||R.x>W+40||R.y<-40||R.y>H+40){run=false;say('Robot left the course. Press Reset to try again.')}}
+function stats(){if(!R)return;$('sT').textContent=R.T.toFixed(1)+' s';$('sD').textContent=Math.round(R.D);$('sE').textContent=R.e.toFixed(3);$('sU').textContent=R.u.toFixed(3);$('sC').textContent=(R.n?Math.round(R.on/R.n*100):100)+'%'}
+function render(){g.drawImage(mk,0,0);g.strokeStyle='rgba(47,75,255,.45)';g.lineWidth=2;g.beginPath();trail.forEach(function(p,i){i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])});g.stroke();
+if(!R)return;var S=sensors();g.save();g.translate(R.x,R.y);g.rotate(R.th);g.fillStyle='#14213d';g.fillRect(-14,-11,28,22);g.fillStyle='#2f4bff';g.fillRect(8,-11,6,22);g.restore();
+g.strokeStyle='#14213d';g.lineWidth=2;var c=Math.cos(R.th),s=Math.sin(R.th);g.beginPath();g.moveTo(R.x+c*18+s*val('space')*(val('count')-1)/2,R.y+s*18-c*val('space')*(val('count')-1)/2);g.lineTo(R.x+c*18-s*val('space')*(val('count')-1)/2,R.y+s*18+c*val('space')*(val('count')-1)/2);g.stroke();
+S.forEach(function(q){g.beginPath();g.arc(q.x,q.y,4,0,7);g.fillStyle=q.v>.5?'#ff5a36':'#fff';g.fill();g.strokeStyle='#14213d';g.lineWidth=1.5;g.stroke()});
+g.strokeStyle='#ff5a36';g.lineWidth=3;g.beginPath();g.moveTo(R.x,R.y);g.lineTo(R.x+Math.cos(R.th+R.u*.5)*34,R.y+Math.sin(R.th+R.u*.5)*34);g.stroke()}
+function loop(t){if(run){acc+=Math.min(.1,(t-last)/1000);while(acc>=1/60){tick(1/60);acc-=1/60}stats()}last=t;render();requestAnimationFrame(loop)}
+function start(){if(!R){say('Draw or choose a track first.');return}if(drawing)setDraw(false);run=true;say('Running.')}
+function pause(){run=false;say('Paused.')}
+function step(){if(!R)return;run=false;tick(1/60);stats();say('Stepped one update.')}
+function reset(){place();run=false;say('Reset. Press Start or Step to begin.')}
+$('start').onclick=start;$('pause').onclick=pause;$('step').onclick=step;$('reset').onclick=reset;
+$('preset').onchange=function(){load(this.value)};
+$('draw').onclick=function(){setDraw(!drawing);if(drawing){run=false;say('Drawing mode. Drag on the course to add track.')}};
+$('clear').onclick=function(){$('preset').value='custom';load('custom')};
+$('full').onclick=function(){(cv.requestFullscreen||cv.webkitRequestFullscreen||function(){}).call(cv)};
+function pt(e){var r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
+var down=false,fresh=false;
+cv.addEventListener('pointerdown',function(e){if(!drawing)return;down=true;cv.setPointerCapture(e.pointerId);if(fresh===false&&$('preset').value!='custom'){path=[];paint(path)}$('preset').value='custom';path.push(pt(e));e.preventDefault()});
+cv.addEventListener('pointermove',function(e){if(!down)return;var p=pt(e),q=path[path.length-1];if(!q||Math.hypot(p[0]-q[0],p[1]-q[1])>4){path.push(p);paint(path)}});
+cv.addEventListener('pointerup',function(){if(!down)return;down=false;paint(path);place();say('Track drawn. Press Start to run.')});
+cv.addEventListener('keydown',function(e){var k=e.key.toLowerCase();if(k==' '){e.preventDefault();run?pause():start()}else if(k=='n')step();else if(k=='r')reset();else if(k=='d')$('draw').click();else if(k=='f')$('full').click()});
+load('loop');requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
