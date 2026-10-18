@@ -1,2 +1,7 @@
 The sensor bar samples reflectance across the front of the robot. Each active sensor contributes its signed position to a weighted average. The center of the bar is error zero; readings left or right of center produce negative or positive error.
 Bar chart of five reflectance sensors across the robot bar. The line sits right of center, so the right-hand sensors read strongest. A dashed line marks the bar center (error zero) and a solid line marks the reflectance-weighted position at plus 0.69, the computed steering error.
+The controller combines three terms:
+
+$$u(t) = K_p e(t) + K_i \int e(t)dt + K_d \frac{de(t)}{dt}$$
+
+The correction $u(t)$ speeds one wheel and slows the other. Proportional control reacts to the current offset, integral control corrects persistent bias, and derivative control damps rapid changes.
