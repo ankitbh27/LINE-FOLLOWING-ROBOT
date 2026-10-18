@@ -1,0 +1,28 @@
+Each of these isolates one variable, which is the thing that is genuinely hard to do on real hardware where everything changes at once.
+1. Find the ultimate gain, then halve it
+
+Set the integral and derivative gains to zero and raise the proportional gain until the robot oscillates steadily along a straight section — weaving at a constant amplitude rather than a growing or shrinking one. Halve that value.
+
+You now have a starting Kp derived from a measurement instead of a guess, and it will be close. Add derivative from there until the weave damps out.
+2. Prove that gains are speed-dependent
+
+Tune the robot until it tracks cleanly at a low base speed. Now raise the speed by half and run the same gains without changing anything.
+
+It will weave, cut corners, or lose the line. Nothing about the controller changed — but the same steering correction now produces a larger change in heading per unit of track, so the effective gain went up with the speed. Every tune is a tune at a particular speed, which is why a competition robot slows for corners rather than running one gain everywhere.
+3. Watch the sensor count change what is possible
+
+Run the same track and the same gains with three, five and eight sensors.
+
+
+Sensors 	Position signal 	Effect on tuning
+3 	Coarse, effectively three regions 	Tracks, but cannot be tuned tight — the error quantises
+5 	Smooth enough for proportional steering 	The usual sweet spot
+8 	Fine 	Allows higher gains and higher speed before oscillating
+
+
+The interesting result is that more sensors raise the ceiling rather than improving the floor. At low speed three sensors are fine. The extra resolution only starts paying at the speeds where the coarse error signal becomes the limiting factor.
+4. Break it on purpose at a sharp corner
+
+Raise the speed until the robot loses the line on the tightest corner. Watch what it does next. Then think about what the real robot should do: driving straight ahead is the worst option, because the line was curving away.
+
+That is the reasoning behind holding the last error on line loss rather than zeroing it — zero means “centred”, which commands full speed straight on. Holding the last error keeps the robot turning the way it was already turning, which is where the line went.
