@@ -1,0 +1,108 @@
+import { Link, useRouterState } from "@tanstack/react-router";
+import type { ReactNode } from "react";
+
+const TABS = [
+  { to: "/", label: "Home" },
+  { to: "/mess", label: "Mess" },
+  { to: "/squad", label: "Squad" },
+  { to: "/vault", label: "Vault" },
+  { to: "/syllabus", label: "Syllabus" },
+] as const;
+
+const DATE_FORMATTER = new Intl.DateTimeFormat("en-IN", {
+  weekday: "short",
+  day: "2-digit",
+  month: "short",
+});
+
+export function AppShell({ children }: { children: ReactNode }) {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+
+  return (
+    <div className="mx-auto min-h-screen w-full max-w-[430px] bg-canvas font-display text-ink">
+      <div className="relative flex min-h-screen flex-col overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-32 left-1/2 h-72 w-[130%] -translate-x-1/2 rounded-full bg-lamp/20 blur-3xl"
+        />
+
+        {children}
+
+        <nav
+          aria-label="Primary navigation"
+          className="sticky bottom-0 z-20 mt-auto border-t border-line bg-canvas/95 px-2 pb-5 pt-2 backdrop-blur"
+        >
+          <div className="grid grid-cols-5 gap-1">
+            {TABS.map(({ to, label }) => {
+              const active = pathname === to;
+
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  aria-current={active ? "page" : undefined}
+                  className={`flex flex-col items-center gap-1 rounded-xl py-2 ${
+                    active ? "bg-lamp/10 text-lamp" : "text-sub"
+                  }`}
+                >
+                  <span
+                    className={`text-[15px] leading-none ${
+                      active ? "font-bold" : "font-medium"
+                    }`}
+                  >
+                    {label}
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className={`size-1 rounded-full ${
+                      active ? "bg-lamp" : "bg-transparent"
+                    }`}
+                  />
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      </div>
+    </div>
+  );
+}
+
+export function PageHeader({ title, sub }: { title: string; sub?: string }) {
+  const dateLabel = DATE_FORMATTER.format(new Date());
+
+  return (
+    <header className="relative z-10 flex animate-[lampfade_.7s_both] items-center justify-between px-5 pb-3 pt-6">
+      <div className="flex min-w-0 items-center gap-2.5">
+        <div
+          aria-hidden="true"
+          className="grid size-9 shrink-0 place-items-center rounded-xl bg-lamp font-mono text-base font-bold text-canvas"
+        >
+          H
+        </div>
+
+        <div className="min-w-0">
+          <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-sub">
+            {title}
+          </p>
+          <p className="truncate text-[13px] font-semibold leading-tight">
+            {sub ?? "Block B · Level 3"}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex shrink-0 items-center gap-2.5">
+        <time className="rounded-full border border-line bg-surface px-2.5 py-1 font-mono text-[10px] text-sub">
+          {dateLabel}
+        </time>
+        <div
+          role="img"
+          aria-label="Profile: RV"
+          className="grid size-9 place-items-center rounded-xl border border-line bg-surface font-mono text-[10px] font-bold text-lamp"
+        >
+          RV
+        </div>
+      </div>
+    </header>
+  );
+}
